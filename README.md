@@ -12,8 +12,8 @@
 
 | 文件 | 架构 | 体积 | 适用设备 |
 |---|---|---|---|
-| `AppleMusicTV7-0.1.0-debug-arm64-v8a.apk` | arm64-v8a（64 位 ARM） | 42.8 MB | 2018 年后的电视盒子、投影仪、电视 |
-| `AppleMusicTV7-0.1.0-debug-armeabi-v7a.apk` | armeabi-v7a（32 位 ARM） | 41.8 MB | 老款 ARM 盒子、部分国产 TV 主板 |
+| `AppleMusicTV7-0.1.0-debug-arm64-v8a.apk` | arm64-v8a（64 位 ARM） | 40.9 MB | 2018 年后的电视盒子、投影仪、电视 |
+| `AppleMusicTV7-0.1.0-debug-armeabi-v7a.apk` | armeabi-v7a（32 位 ARM） | 39.8 MB | 老款 ARM 盒子、部分国产 TV 主板 |
 
 > 只提供 ARM 包。x86 / x86_64 模拟器不单独出包，靠 ARM 转译层（libhoudini / libnb）运行。
 > 不确定架构时先装 `arm64-v8a`，报「解析包出错」或「应用未安装」再换 `armeabi-v7a`。
@@ -27,7 +27,7 @@
 | 最低系统 | Android 8.0（API 26） |
 | 目标系统 | Android 16（API 36） |
 | 架构 | arm64-v8a / armeabi-v7a |
-| 体积 | 41.8 – 42.8 MB（分架构） |
+| 体积 | 39.8 – 40.9 MB（分架构） |
 
 ## 安装
 
