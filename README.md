@@ -1,19 +1,43 @@
 # Apple Music TV7
 
-**Apple Music TV 7.0 风格的 Android TV 客户端。**
+**Apple TV 7.0 风格的 Android TV 客户端。**
 
-本仓库只用于**分发安装包与更新日志**。项目闭源，源代码不公开。
+本仓库只用于**分发安装包与更新日志**。当前版本闭源，源代码暂不公开。
 
 ---
+
+## 安全与隐私
+
+本项目把账号安全和用户隐私放在第一位，实现上遵循以下原则：
+
+- **不上传任何用户数据**：应用内没有遥测、埋点、行为分析或崩溃上报模块，不会把你的播放记录、搜索词、歌单、账号信息发送到任何第三方服务器。
+- **不收集账号密码**：登录完全走 Apple Music 官方授权流程（扫码 / 网页 OAuth），账号凭据由系统在本地安全存储，应用只持有访问令牌，从不接触你的密码。
+- **网络请求范围明确且有限**：应用只会连接播放所必需的官方服务（`api.music.apple.com`、`play.itunes.apple.com`、Apple 图片 CDN）与官方登录服务（`oauth2.googleapis.com`）。没有隐藏的后台上报通道。
+- **本地处理**：歌词解析、封面取色、频谱分析、音频解密全部在设备本地完成；缓存只写入应用私有目录。
+- **闭源审计友好**：关键逻辑（认证、令牌、解密）都做了最小化处理，令牌与签名 URL 不会被写入日志或界面。
+
+> 一句话：这是一个"只读取你授权的内容、只在本地处理、不向外发送任何数据"的播放器。
+
+## 参考与致谢
+
+本项目在开发过程中参考了以下开源项目与资料，在此致谢。正是它们让这个项目得以实现：
+
+- **[lavande16/Apple-Music-For-Android-TV](https://github.com/lavande16/Apple-Music-For-Android-TV)** —— Apple Music 网页播放（`webPlayback`）通道、直播电台流与软件 CDM 播放链路的重要参考。
+- **[veacon/veil.music](https://github.com/veacon/veil.music)** —— 软件 Widevine L3 CDM 实现（challenge 生成、license 解析、CENC 解密）的来源，使播放不依赖设备内置 DRM keybox。
+- **Apple Music 官方客户端** —— Apple TV 7.0 界面布局、交互与逐字歌词呈现的复刻参照，用于个人学习与界面研究。
+- **AndroidX Media3 / ExoPlayer** —— HLS 流媒体、DRM 会话与音频渲染的基础框架。
+- **Bouncy Castle** —— RSA-PSS 签名等密码学运算支持。
+
+本项目为个人学习与自用作品，与 Apple Inc. 及上述项目作者无任何关联。
 
 ## 下载
 
 前往 **[Releases](../../releases)** 页面，按设备架构选择对应安装包：
 
-| 文件 | 架构 | 体积 | 适用设备 |
-|---|---|---|---|
-| `AppleMusicTV7-0.1.0-debug-arm64-v8a.apk` | arm64-v8a（64 位 ARM） | 40.9 MB | 2018 年后的电视盒子、投影仪、电视 |
-| `AppleMusicTV7-0.1.0-debug-armeabi-v7a.apk` | armeabi-v7a（32 位 ARM） | 39.8 MB | 老款 ARM 盒子、部分国产 TV 主板 |
+| 文件 | 架构 | 适用设备 |
+|---|---|---|
+| `AppleMusicTV7-0.2.0-debug-arm64-v8a.apk` | arm64-v8a（64 位 ARM） | 2018 年后的电视盒子、投影仪、电视 |
+| `AppleMusicTV7-0.2.0-debug-armeabi-v7a.apk` | armeabi-v7a（32 位 ARM） | 老款 ARM 盒子、部分国产 TV 主板 |
 
 > 只提供 ARM 包。x86 / x86_64 模拟器不单独出包，靠 ARM 转译层（libhoudini / libnb）运行。
 > 不确定架构时先装 `arm64-v8a`，报「解析包出错」或「应用未安装」再换 `armeabi-v7a`。
@@ -27,13 +51,12 @@
 | 最低系统 | Android 8.0（API 26） |
 | 目标系统 | Android 16（API 36） |
 | 架构 | arm64-v8a / armeabi-v7a |
-| 体积 | 39.8 – 40.9 MB（分架构） |
 
 ## 安装
 
 ```bash
 # 有 adb 时（先 adb connect <电视IP>:5555）
-adb install -r AppleMusicTV7-0.1.0-debug-arm64-v8a.apk
+adb install -r AppleMusicTV7-0.2.0-debug-arm64-v8a.apk
 ```
 
 没有 adb 时把 APK 拷到 U 盘，用电视的「文件管理 / 应用安装器」侧载，或用当贝市场等工具推送。
@@ -45,9 +68,19 @@ adb install -r AppleMusicTV7-0.1.0-debug-arm64-v8a.apk
 - **搜索**：一级分类网格（5×4）→ 二级实时输入与结果，支持艺人 / 歌曲 / 专辑 / 建议词
 - **侧边栏**：主页、浏览、广播、资料库、搜索，底部账户入口未登录直接弹二维码扫码登录
 - **播放器**：歌词滚动、队列面板、封面动效、音频频谱
+- **播放**：网页播放通道 + 软件 CDM 解密，不依赖设备内置 DRM keybox；设置中可选软解 / 硬解 / 自动
+- **电台**：广播电台走歌曲队列 + 软件解密，绕过模拟器缺失的 DRM provisioning
 - **设置**：资料库写入开关、播放列表倒序、低性能模式、音频质量、杜比全景声、封面动效、频谱权限、磁盘缓存与清除缓存
 
 ## 更新日志
+
+### v0.2.0 — 2026-11-24
+
+- 播放：新增网页播放通道 + 软件 Widevine L3 CDM，普通歌曲无需设备 DRM keybox 即可解密播放
+- 播放：设置页新增真实软解 / 硬解 / 自动切换，作用于 HLS 解码器选择
+- 电台：广播电台改为歌曲队列 + 软件解密，修复模拟器上因 DRM provisioning 缺失导致的卡死
+- 界面：顶栏返回 / 胶囊 / 更多三控件高度与位置统一，修复焦点态双圆重叠
+- 搜索：移除一级搜索框左侧多余图标，贴近原版
 
 ### v0.1.0 — 2026-11-23
 
@@ -60,6 +93,12 @@ adb install -r AppleMusicTV7-0.1.0-debug-arm64-v8a.apk
 - 按 ABI 拆分安装包，单包体积从 50 MB 降到 42 MB
 - 修复：搜索页返回键失效、返回后光标丢失、冷启动落在空白页
 - 移除未启用的两套旧皮肤
+
+## 开源计划
+
+目前项目仍在快速迭代与稳定性验证阶段，暂不公开源码。待功能与播放链路足够稳定、并完成必要的代码整理后，会考虑以开源方式发布，让更多人参与改进。届时以本仓库公告为准。
+
+在此之前，欢迎通过 Issues 反馈问题与建议。
 
 ## 说明
 
